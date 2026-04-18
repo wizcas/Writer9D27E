@@ -1,0 +1,80 @@
+name: release
+
+# 将构建产物推送到目标 CDN 仓库，并在目标仓库打递增整数 tag（用于 jsdelivr CDN 缓存刷新）。
+#
+# 使用前需在本仓库 Settings → Secrets and variables → Actions 中配置：
+#   Variables（非 Secrets）:
+#     RELEASE_REPO   目标仓库的完整名称，如 yourname/your-cdn-repo
+#     RELEASE_PATH   dist 内容在目标仓库中的存放路径，如 MyProject
+#   Secrets:
+#     RELEASE_TOKEN  有目标仓库写权限的 GitHub Personal Access Token
+#
+# 若 RELEASE_REPO 未配置，整个 job 会自动跳过，不会报错。
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths-ignore:
+      - dist/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # RELEASE_REPO 未配置时跳过，避免 template fork 后直接报错
+    if: ${{ vars.RELEASE_REPO != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - run: pnpm install && pnpm build
+
+      - name: Remove 示例 in dist
+        run: |
+          rm -rf dist/角色卡示例 dist/脚本示例 dist/流式楼层界面示例 dist/前端界面示例
+
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.RELEASE_REPO }}
+          token: ${{ secrets.RELEASE_TOKEN }}
+          path: _target_repo
+
+      - name: Copy dist to target repository
+        run: |
+          mkdir -p "_target_repo/${{ vars.RELEASE_PATH }}"
+          cp -rf dist/. "_target_repo/${{ vars.RELEASE_PATH }}/"
+
+      - name: Commit and push to target repository
+        working-directory: _target_repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ vars.RELEASE_PATH }}/"
+          git diff --cached --quiet || git commit -m "[bot] release from ${{ github.repository }}@${{ github.sha }}"
+          git push
+
+      - name: Tag target repository
+        working-directory: _target_repo
+        run: |
+          git fetch --tags
+          LATEST=$(git tag | grep -E '^[0-9]+$' | sort -n | tail -1)
+          NEXT=$((${LATEST:-0} + 1))
+          git tag "$NEXT"
+          git push origin "$NEXT"

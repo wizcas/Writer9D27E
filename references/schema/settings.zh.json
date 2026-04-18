@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "user名称": {
+      "type": "string",
+      "pattern": "^\\S+$"
+    },
+    "配置": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "类型": {
+            "type": "string",
+            "enum": [
+              "角色卡",
+              "世界书",
+              "预设"
+            ]
+          },
+          "酒馆中的名称": {
+            "type": "string",
+            "description": "角色卡/世界书/预设的配置文件要提取到本地哪个文件中, 可以是绝对路径或相对于本文件的相对路径"
+          },
+          "本地文件路径": {
+            "description": "角色卡/世界书/预设的配置文件要提取到本地哪个文件中, 可以是绝对路径或相对于本文件的相对路径",
+            "$ref": "#/$defs/__schema0"
+          },
+          "导出文件路径": {
+            "description": "当使用 `node tavern_sync.mjs bundle 配置名称` 打包角色卡/世界书/预设文件时, 要将它存放在哪个文件中; 不填则默认打包到角色卡/世界书/预设配置文件的同目录下",
+            "$ref": "#/$defs/__schema1"
+          }
+        },
+        "required": [
+          "类型",
+          "酒馆中的名称",
+          "本地文件路径"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "配置"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "type": "string"
+    },
+    "__schema1": {
+      "type": "string"
+    }
+  }
+}

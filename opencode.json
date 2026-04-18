@@ -1,0 +1,23 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    ".cursor/rules/项目基本概念.mdc",
+    ".cursor/rules/酒馆变量.mdc",
+    ".cursor/rules/酒馆助手接口.mdc",
+    ".cursor/rules/mcp.mdc",
+    ".cursor/rules/前端界面.mdc",
+    ".cursor/rules/脚本.mdc",
+    ".cursor/rules/mvu变量框架.mdc",
+    ".cursor/rules/mvu角色卡.mdc"
+  ],
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["cmd", "/c", "pnpx", "chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9222"],
+      "environment": {
+        "PATH": "C:\\Users\\chen\\scoop\\apps\\fnm\\current\\node-versions\\v25.4.0\\installation;C:\\Users\\chen\\AppData\\Local\\pnpm;C:\\Windows\\system32;C:\\Windows"
+      },
+      "enabled": true
+    }
+  }
+}
