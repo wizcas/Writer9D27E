@@ -1,0 +1,81 @@
+name: tag_on_merge
+
+# PR 合并时，根据 release label 自动递增 semver tag 并推送到本仓库。
+# 推送 tag 后将触发 release.yaml 构建并发布到目标 CDN 仓库。
+#
+# release label 对应的版本递增规则：
+#   release:major  →  major+1, minor=0, patch=0  （如 v1.2.3 → v2.0.0）
+#   release:minor  →  minor+1, patch=0            （如 v1.2.3 → v1.3.0）
+#   release:patch  →  patch+1                     （如 v1.2.3 → v1.2.4）
+#
+# 若 PR 没有 release label，静默跳过，不打 tag 也不触发发布。
+# 若仓库尚无任何 v* tag，基准版本为 v0.0.0，递增后第一个 tag 为 v0.1.0（minor）等。
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump semver tag
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          # 找出 release label
+          BUMP=$(echo "$LABELS" | tr ',' '\n' | grep -o 'release:[a-z]*' | head -1 || true)
+
+          if [ -z "$BUMP" ]; then
+            echo "没有 release label，跳过打 tag。"
+            exit 0
+          fi
+
+          echo "release label: $BUMP"
+
+          # 读取当前最新 v* tag（按 semver 排序）
+          LATEST=$(git tag -l 'v*' | sort -V | tail -1)
+          if [ -z "$LATEST" ]; then
+            LATEST="v0.0.0"
+            echo "仓库无 v* tag，基准版本设为 $LATEST"
+          else
+            echo "当前最新 tag：$LATEST"
+          fi
+
+          # 拆分版本号
+          VERSION="${LATEST#v}"
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+          # 按 label 递增
+          case "$BUMP" in
+            release:major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            release:minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            release:patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_TAG="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "新 tag：$NEW_TAG"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"

@@ -1,6 +1,7 @@
 name: release
 
-# 将构建产物推送到目标 CDN 仓库，并在目标仓库打递增整数 tag（用于 jsdelivr CDN 缓存刷新）。
+# 将构建产物推送到目标 CDN 仓库，并在目标仓库打 `<RELEASE_PATH根目录>-<semver>` 格式 tag（用于 jsdelivr CDN 缓存刷新）。
+# 触发方式：在本仓库推送 v* 格式 tag（如 v1.0.0），或在 GitHub Actions 页面手动触发并填写版本号。
 #
 # 使用前需在本仓库 Settings → Secrets and variables → Actions 中配置：
 #   Variables（非 Secrets）:
@@ -13,12 +14,13 @@ name: release
 
 on:
   push:
-    branches:
-      - master
-      - main
-    paths-ignore:
-      - dist/**
+    tags:
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（如 1.0.0）'
+        required: true
 
 permissions:
   contents: read
@@ -73,8 +75,15 @@ jobs:
       - name: Tag target repository
         working-directory: _target_repo
         run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"
+          fi
+          PREFIX="${{ vars.RELEASE_PATH }}"
+          PREFIX="${PREFIX%%/*}"
+          TAG="${PREFIX}-${VERSION}"
           git fetch --tags
-          LATEST=$(git tag | grep -E '^[0-9]+$' | sort -n | tail -1)
-          NEXT=$((${LATEST:-0} + 1))
-          git tag "$NEXT"
-          git push origin "$NEXT"
+          git tag "$TAG"
+          git push origin "$TAG"

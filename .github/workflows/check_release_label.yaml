@@ -1,0 +1,35 @@
+name: check_release_label
+
+# 检查 PR 是否有且仅有一个 release label（release:major / release:minor / release:patch）。
+# 此检查不阻止合并，仅在 PR 页面的检查项中显示结果。
+#
+# PR 合并时，tag_on_merge.yaml 会根据 release label 自动打 semver tag。
+# 若 PR 没有 release label，合并后不会打 tag，也不会触发发布。
+
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check release label
+        env:
+          LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: |
+          RELEASE_LABELS=$(echo "$LABELS" | tr ',' '\n' | grep -o 'release:[a-z]*' || true)
+          COUNT=$(echo "$RELEASE_LABELS" | grep -c 'release:' || true)
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::PR 缺少 release label，请添加 release:major、release:minor 或 release:patch 之一。合并后将不会打 tag 也不会触发发布。"
+            exit 1
+          elif [ "$COUNT" -gt 1 ]; then
+            echo "::error::PR 有多个 release label（$RELEASE_LABELS），只能保留一个。"
+            exit 1
+          else
+            echo "release label 检查通过：$RELEASE_LABELS"
+          fi
