@@ -11,12 +11,13 @@ pnpm-debug.log*
 
 auto-imports.d.ts
 components.d.ts
-<<<<<<< HEAD
 
 dist/
 tmp/
 
 .github-sync/
 export/
-=======
->>>>>>> 098e1f6e4ff8f2f726c3a97ca746d13033a2c842
+
+char/
+!char/世界书/[mvu_update]变量输出格式.yaml
+!char/世界书/变量列表.yaml
