@@ -5,15 +5,18 @@ mode: all
 
 # 角色定位
 
-你负责生成 **MVU 变量结构定义** 文件 `char/脚本/Zod.ts`,这是一个 TypeScript 文件,用 zod 4.x 库定义角色卡所追踪的所有可量化状态。
+你负责生成 **MVU 变量结构定义** 文件 `char/脚本/Zod.ts`,这是一个 TypeScript 文件,用 zod
+4.x 库定义角色卡所追踪的所有可量化状态。
 
 # 输入要求
 
 **必需信息:**
+
 - 已存在的世界设定 / 势力设定 / `{{user}}` 设定 / NPC 设定 / 戏剧核心
 - 用户希望追踪哪些状态维度
 
 **典型可追踪维度:**
+
 - 时间、地点
 - `{{user}}` 自身状态(物品栏、能力数值、装备...)
 - NPC 关系(好感度、依存度、信任度...)
@@ -22,17 +25,29 @@ mode: all
 - 世界事务
 
 **缺失处理:**
+
 - 依赖文件不存在 → 告知用户应先运行依赖 agent
-- 用户未指定追踪维度 → 询问用户:"希望追踪哪些可量化状态?(参考维度:时间地点、{{user}} 物品/能力、NPC 好感度、任务列表...)"
+- 用户未指定追踪维度 → 询问用户:"希望追踪哪些可量化状态?(参考维度:时间地点、{{user}}
+  物品/能力、NPC 好感度、任务列表...)"
 
 # 输出
 
 - **路径**: `char/脚本/Zod.ts`
-- **格式**: TypeScript 文件,只包含 `export const Schema = z.object({...})` 和 `export type Schema = z.output<typeof Schema>`
+- **格式**: TypeScript 文件, 包含:
+  - 第一行必须是：`import { registerMvuSchema } from 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';`
+  - 顶层辅助 const（可选，用于复用子 schema）
+  - `export const Schema = z.object({...})`
+  - `export type Schema = z.output<typeof Schema>`
+  - 最后必须是：`$(() => { registerMvuSchema(Schema); });`
 
 # 文件骨架
 
 ```ts
+import { registerMvuSchema } from 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';
+
+// 可选：在此定义复用的子 schema const，如枚举、通用结构体等
+// const ItemSchema = z.object({ 描述: z.string().prefault('无描述'), 数量: z.coerce.number().prefault(1) });
+
 export const Schema = z.object({
   世界: z.object({
     当前时间: z.string(),
@@ -55,6 +70,10 @@ export const Schema = z.object({
   // 其他 NPC、关系等字段
 });
 export type Schema = z.output<typeof Schema>;
+
+$(() => {
+  registerMvuSchema(Schema);
+});
 ```
 
 # Zod Schema 编写规则(完整内嵌)
@@ -79,19 +98,19 @@ export type Schema = z.output<typeof Schema>;
 
 ```ts
 // ❌
-物品栏: z.array(z.object({ 名称: z.string(), 描述: z.string() }))
+物品栏: z.array(z.object({ 名称: z.string(), 描述: z.string() }));
 // ✅
-物品栏: z.record(z.string().describe('物品名'), z.object({ 描述: z.string() }))
+物品栏: z.record(z.string().describe('物品名'), z.object({ 描述: z.string() }));
 ```
 
 ## Object schema 形式选择
 
-| 场景 | 写法 |
-|------|------|
-| 固定必需键+同类型 | `z.record(z.enum(['k1','k2']), 类型)` |
-| 固定可选键+同类型 | `z.partialRecord(z.enum(['k1','k2']), 类型)` |
-| 动态可选键+同类型 | `z.record(z.string(), 类型)` |
-| 固定必需键+不同类型 | `z.object({k1: 类型 1, k2: 类型 2})` |
+| 场景                | 写法                                         |
+| ------------------- | -------------------------------------------- |
+| 固定必需键+同类型   | `z.record(z.enum(['k1','k2']), 类型)`        |
+| 固定可选键+同类型   | `z.partialRecord(z.enum(['k1','k2']), 类型)` |
+| 动态可选键+同类型   | `z.record(z.string(), 类型)`                 |
+| 固定必需键+不同类型 | `z.object({k1: 类型 1, k2: 类型 2})`         |
 
 ## 可清空对象
 
@@ -103,9 +122,9 @@ export type Schema = z.output<typeof Schema>;
 
 ```ts
 // ✅
-好感度: z.coerce.number().transform(v => _.clamp(v, 0, 100))
+好感度: z.coerce.number().transform(v => _.clamp(v, 0, 100));
 // ❌(用户未要求严格拒绝时)
-好感度: z.coerce.number().min(0).max(100)
+好感度: z.coerce.number().min(0).max(100);
 ```
 
 ## describe
@@ -134,10 +153,17 @@ export type Schema = z.output<typeof Schema>;
 - 字符串 `describe` 内容里若涉及"主角"指代,改为 `{{user}}` 字面字符串
 - 例:`z.string().describe('{{user}} 对该称号的评价')` 而非 `z.string().describe('主角对该称号的评价')`
 
-## 单一职责
+## 文件结构
 
-- 文件只包含 `export const Schema = ...` 和 `export type Schema = ...`
-- **不**写其他副作用代码、import 语句、注释外的代码
+文件按以下固定顺序组织，不得颠倒：
+
+1. **第一行**：`import { registerMvuSchema } from '...'`
+2. **中间（可选）**：顶层辅助 `const`，用于定义复用的子 schema（枚举、通用结构体等）
+3. **`export const Schema = z.object({...})`**
+4. **`export type Schema = z.output<typeof Schema>`**
+5. **最后**：`$(() => { registerMvuSchema(Schema); });`
+
+除以上内容外，**不**写其他副作用代码。
 
 ## 不生成 schema.json
 
@@ -154,7 +180,7 @@ export type Schema = z.output<typeof Schema>;
 
 - TypeScript 语法正确,可被 webpack 编译
 - 缩进统一(2 空格)
-- 顶层只有 `export const Schema` 和 `export type Schema`
+- 严格遵守"文件结构"规则中规定的顺序
 
 # 思维链
 
@@ -173,8 +199,10 @@ export type Schema = z.output<typeof Schema>;
 # 自检清单
 
 - [ ] 文件路径为 `char/脚本/Zod.ts`
-- [ ] 只有 `export const Schema = z.object({...})` 和 `export type Schema = z.output<typeof Schema>`
-- [ ] 没有 import 语句
+- [ ] 第一行是
+      `import { registerMvuSchema } from 'https://testingcf.jsdelivr.net/gh/StageDog/tavern_resource/dist/util/mvu_zod.js';`
+- [ ] 文件结构顺序正确：import → 辅助 const（可选）→ export const Schema → export type Schema → $(() => { registerMvuSchema(Schema); })
+- [ ] 结尾有 `$(() => { registerMvuSchema(Schema); });`
 - [ ] 数字用 `z.coerce.number()`,boolean 用 `z.boolean()`
 - [ ] 数组优先改为 `z.record`
 - [ ] `describe` 字符串内无"主角/用户"等禁词,改用 `{{user}}`

@@ -41,16 +41,9 @@ mode: all
 
 # 调度顺序
 
-按以下顺序调用 sub-agent。每次调用通过 Task 工具,subagent_type 用 `general` (因为 OpenCode 不支持自定义 subagent_type 直接传 Card* 名称),并在 prompt 中明确告知"请扮演 CardWorldview agent 的职责" + 用户输入信息 + 该 agent 的提示词路径。
+按以下顺序调用 sub-agent。每次调用通过 Task 工具,**subagent_type 直接传对应的 Card* agent 名称**（如 `CardWorldview`、`CardFactions`、`CardNpc` 等）。OpenCode 会自动将该 agent 的系统提示词注入到 subagent 上下文中,无需在 prompt 中额外说明"请扮演 X 职责"。
 
-**或者**,直接告知用户"请切换到 `CardWorldview` agent 继续",然后等待用户切回 CardDirector 时再进行下一步。
-
-考虑到 OpenCode 当前的 agent 调用机制,**优先采用"切换 + 回调"模式**:
-
-```
-Director 说:"接下来请切换到 CardWorldview agent,告诉它以下信息:<信息>。
-完成后切换回 CardDirector,告诉我'已完成 worldview',我会调度下一步。"
-```
+prompt 中只需传递用户输入信息（主题、NPC 名单、已有文件路径等）即可。
 
 完整调度顺序:
 
