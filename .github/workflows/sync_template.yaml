@@ -28,3 +28,12 @@ jobs:
           template_sync_ignore_file_path: .github/.templatesyncignore
           is_force_deletion: true
           git_remote_pull_params: --allow-unrelated-histories --strategy=recursive --no-edit -X diff-algorithm=minimal -X ignore-all-space -X patience -X renormalize
+      - uses: AndreasAugustin/actions-template-sync@v2
+        with:
+          source_repo_path: wizcas/Writer9D27E
+          pr_title: '[bot] 同步 wizcas/Writer9D27E 的更新'
+          pr_commit_msg: '[bot] bump wizcas/Writer9D27E update'
+          is_pr_cleanup: true
+          template_sync_ignore_file_path: .github/.templatesyncignore
+          is_force_deletion: true
+          git_remote_pull_params: --allow-unrelated-histories --strategy=recursive --no-edit -X diff-algorithm=minimal -X ignore-all-space -X patience -X renormalize
