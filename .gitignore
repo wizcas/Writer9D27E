@@ -11,6 +11,7 @@ pnpm-debug.log*
 
 auto-imports.d.ts
 components.d.ts
+<<<<<<< HEAD
 
 dist/
 tmp/
@@ -21,3 +22,5 @@ export/
 char/
 !char/世界书/[mvu_update]变量输出格式.yaml
 !char/世界书/变量列表.yaml
+=======
+>>>>>>> 5427fc4312cb5983ca9885b5f500c6082deaadf5
