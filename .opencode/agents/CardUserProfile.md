@@ -42,15 +42,15 @@ mode: all
 
 # 输出
 
-- **路径**: `char/世界书/user设定.md`
+- **路径**: `char/世界书/主角设定.md`
 - **格式**: Markdown 文件(扩展名 `.md`),内嵌 XML 大块,XML 标签内**直接是 YAML 数据**(不要包 ` ```yaml ` 代码块)
 
 # 输出格式骨架
 
 ```markdown
-# user 设定
+# {{user}} 设定
 
-<user_profile>
+<protagonist_profile>
 identity:
   年龄: <数字或字符串>
   性别: <字符串>
@@ -78,7 +78,7 @@ social_connection:
     <势力名 1>: <字符串>
   与关键 NPC 关系(若有):
     <NPC 名>: <字符串>
-</user_profile>
+</protagonist_profile>
 ```
 
 # 强制规则
@@ -91,7 +91,7 @@ social_connection:
 - ❌ 字符串值里出现"用户的爱好" → ✅ "{{user}} 的爱好"
 
 字段名(YAML key)可保留原词:
-- ✅ `<user_profile>` 标签名可保留
+- ✅ `<protagonist_profile>` 标签名可保留
 
 ## 单一职责
 
@@ -100,8 +100,8 @@ social_connection:
 ## 格式
 
 - 文件扩展名为 `.md`
-- 顶层用 Markdown 标题(`# user 设定`)
-- 数据用 `<user_profile>` XML 标签包裹
+- 顶层用 Markdown 标题(`# {{user}} 设定`)
+- 数据用 `<protagonist_profile>` XML 标签包裹
 - **XML 标签内直接放 YAML 数据**,**禁止**包 ` ```yaml ` 代码块
 - XML 标签必须闭合
 
@@ -118,14 +118,14 @@ social_connection:
 2. 询问/确认 `{{user}}` 的核心定位三要素
 3. 引导设计性格调色盘和特殊能力
 4. 用户确认后，起草 Markdown(含 XML 标签 + 标签内直接的 YAML 数据),**全文用 `{{user}}` 替代任何指代**
-5. 写入 `char/世界书/user设定.md`
+5. 写入 `char/世界书/主角设定.md`
 6. 输出摘要
 
 # 自检清单
 
 - [ ] 仅当用户明确回复“输出/确认”时，才生成 XML 代码块。
-- [ ] 文件路径为 `char/世界书/user设定.md`(扩展名是 `.md`)
-- [ ] 顶层 XML 标签 `<user_profile>` 已闭合
+- [ ] 文件路径为 `char/世界书/主角设定.md`(扩展名是 `.md`)
+- [ ] 顶层 XML 标签 `<protagonist_profile>` 已闭合
 - [ ] YAML 数据**直接**位于 XML 标签内,**没有**被 ` ```yaml ... ``` ` 代码块包裹
 - [ ] 全文所有指代用户的位置都用 `{{user}}`
 - [ ] 没有任何八股词汇和主观评价，符合绝对零度原则。

@@ -55,7 +55,7 @@ export const Schema = z.object({
     近期事务: z.record(z.string().describe('事务名'), z.string().describe('事务描述')),
   }),
 
-  user: z.object({
+  主角: z.object({
     物品栏: z
       .record(
         z.string().describe('物品名'),
@@ -142,8 +142,8 @@ $(() => {
 
 ## 字段命名
 
-- 顶层 key 用中文(如 `世界`、`某 NPC 名`)或英文(如 `user`)
-- **不**使用 `主角` / `玩家` 作为 key,**用 `user`**
+- 顶层 key 必须用中文(如 `世界`、`某 NPC 名`、`主角`)
+- 变量键名**绝对禁止**使用 `user` 或 `{{user}}`，遇到玩家相关的键名**必须**使用名词 `主角` 代替。
 - 嵌套字段名用中文短词(如 `好感度`、`物品栏`、`着装`)
 
 ## {{user}} 替换
@@ -184,7 +184,7 @@ $(() => {
 
 # 思维链
 
-1. 用 Read 工具读取所有已生成的世界书条目(world / factions / user / NPC × N / drama)
+1. 用 Read 工具读取所有已生成的世界书条目(world / factions / 主角设定 / NPC × N / drama)
 2. 询问/确认要追踪的状态维度
 3. 对每个维度,设计合适的 zod 类型
    - 数字 → `z.coerce.number()`,需要范围限制时用 `transform(clamp)`
@@ -208,6 +208,6 @@ $(() => {
 - [ ] `describe` 字符串内无"主角/用户"等禁词,改用 `{{user}}`
 - [ ] 没有用 `z.passthrough` / `z.strict`
 - [ ] 没有用 context 参数的 transform
-- [ ] 顶层 user 字段名用 `user` 而非 `主角`/`玩家`
+- [ ] 顶层字段名必须用 `主角` 而非 `user` 或 `{{user}}`
 - [ ] 所有 NPC 字段名与 `char/世界书/NPC/` 下文件名对应
 - [ ] TS 语法正确(没有未闭合的括号)

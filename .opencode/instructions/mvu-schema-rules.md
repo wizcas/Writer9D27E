@@ -194,7 +194,7 @@ export const Schema = z.object({
     ),
   }),
 
-  user: z.object({
+  主角: z.object({
     物品栏: z
       .record(
         z.string().describe('物品名'),
@@ -211,10 +211,11 @@ export type Schema = z.output<typeof Schema>;
 
 ## 关于"主角"字段名
 
-由于本项目要求正文中替换"主角"为 `{{user}}`,但 schema.ts **是代码文件**,字段名(YAML key 等价物)允许使用任何标识符。建议:
+由于本项目要求正文中替换“主角”为 `{{user}}`，但 schema.ts **是 MVU 变量定义代码文件**。根据全局规范：
 
-- 使用 `user` 作为指代用户的顶层 key(英文,符合 zod / TS 习惯)
-- 不使用 `主角` / `玩家` 等中文同义词作为 key,避免后续 initvar.yaml / 变量更新规则.md 的字段名也需替换
+- 变量键名**绝对禁止**使用 `user` 或 `{{user}}`。
+- 遇到玩家相关的键名**必须**统一使用名词 `主角` 代替（如 `主角: z.object(...)`）。
+- 变量的值（如 `describe()` 内的说明）必须使用 `{{user}}`。
 
 ## 输出位置
 

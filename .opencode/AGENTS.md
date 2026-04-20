@@ -24,7 +24,7 @@
 | CardWorldview | `char/世界书/世界设定.md` | Markdown(内嵌 XML+YAML) |
 | CardFactions | `char/世界书/势力设定.md` | Markdown(内嵌 XML+YAML) |
 | CardNarrativeStyle | `char/世界书/叙事风格.md` | Markdown(内嵌 XML+YAML) |
-| CardUserProfile | `char/世界书/user设定.md` | Markdown(内嵌 XML+YAML) |
+| CardUserProfile | `char/世界书/主角设定.md` | Markdown(内嵌 XML+YAML) |
 | CardDramaCore | `char/世界书/戏剧核心.md` | Markdown(内嵌 XML+YAML) |
 | CardNpc | `char/世界书/NPC/<NPC 名>.md` | Markdown(内嵌 XML+YAML) |
 | CardFirstMessage | `char/第一条消息/0.md` | Markdown(内嵌叙事正文) |
@@ -50,22 +50,24 @@
 - 你(指代用户时)
 - pc / PC / Player Character
 
-**例外(允许保留原词):**
+**绝对禁止使用 `{{user}}` 以及英文 `user`，必须使用名词 `主角` 代替的场景(例外):**
 
-- 文件路径
-- 文件名(用 `user` 替代,无双花括号)
-- YAML 字段键名(如 `主角评价` 作为 key 可保留,但其字符串值里必须用 `{{user}}`)
-- XML 标签名(如 `<user_profile>`)
-- Markdown 章节标题(如 `## 主角设定`)
+- **所有文件名**(例如: `char/世界书/主角设定.md`，不能用 `user设定.md` 或 `{{user}}设定.md`)
+- **`index.yaml` 的键(Key)和条目标题(Title / name)**(例如: `[世界书]主角设定`)
+- **MVU、Zod 及变量系统中的键名(Key)**(例如: `主角: z.object(...)` 代替 `user: z.object(...)`，`主角.物品栏` 代替 `user.物品栏`)
+- XML 标签名(如 `<protagonist_profile>`)
+
+**注意: 上述例外之外的所有场景(包括世界书的 YAML 键名、Markdown 标题等)，必须全部使用 `{{user}}`，禁止使用 `主角`、`男主`、`user` 等。**
 
 完整规则、边界判定示例、自检流程见 `.opencode/instructions/user-replacement.md`。
 
 ## 强制规则 3:文件命名禁用 `{{user}}`
 
-文件名中**禁止**出现 `{{user}}` 字面量。需要表达"用户"概念时使用 `user`(无双花括号)。
+文件名中**绝对禁止**出现 `{{user}}` 或 `user` 字面量。需要表达"用户"概念时，**必须使用名词 `主角` 代替**。
 
 例:
-- ✅ `char/世界书/user设定.md`
+- ✅ `char/世界书/主角设定.md`
+- ❌ `char/世界书/user设定.md`
 - ❌ `char/世界书/{{user}}设定.md`
 
 ## 强制规则 4:禁止预设具体世界观

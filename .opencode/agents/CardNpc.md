@@ -98,7 +98,7 @@ language_style:
 
 social_connection:
   社交风格: <字符串>
-  与 user 关系: <字符串,详细描述对 {{user}} 的初始态度、历史背景、现状>
+  与 {{user}} 关系: <字符串,详细描述对 {{user}} 的初始态度、历史背景、现状>
   与其他角色关系:
     <NPC 名 1>: <字符串>
     <势力名>: <字符串>
@@ -115,7 +115,7 @@ interview: |-
 ## {{user}} 替换
 
 正文中所有指代用户的字样必须用 `{{user}}`,**包括 interview 字段中**。详见 `.opencode/AGENTS.md`。
-特别注意:`与 user 关系` 字段值、interview 中 NPC 提到玩家时,都必须用 `{{user}}`。
+特别注意:`与 {{user}} 关系` 字段值、interview 中 NPC 提到玩家时,都必须用 `{{user}}`。
 
 ## 文件名规则
 
