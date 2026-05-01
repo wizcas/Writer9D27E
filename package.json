@@ -3,14 +3,21 @@
     "build:dev": "webpack --mode development",
     "build": "webpack --mode production",
     "watch": "webpack --mode development --watch --progress",
+<<<<<<< HEAD
     "serve": "http-server . -p 5500 --cors -c-1",
     "chrome": "start \"\" \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" \"--remote-debugging-port=9222\" \"--user-data-dir=C:\\temp\\chrome-debug\" \"http://localhost:8000\"",
+=======
+>>>>>>> 1135d5998344ca329c4a49283460954de5cb18ce
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css,scss,html,vue}\" --no-error-on-unmatched-pattern",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "dump": "node dump_schema.ts",
+<<<<<<< HEAD
     "sync": "node tavern_sync.mjs",
     "bundle": "node scripts/bundle_release.mjs"
+=======
+    "sync": "node tavern_sync.mjs"
+>>>>>>> 1135d5998344ca329c4a49283460954de5cb18ce
   },
   "browserslist": [
     "defaults and partially supports es6-module"
